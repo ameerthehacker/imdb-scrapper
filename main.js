@@ -1,5 +1,6 @@
 const cheerio = require("cheerio");
 const request = require("request");
+const fs = require('fs');
 
 const scrape = url => {
   return new Promise((resolve, reject) => {
@@ -42,6 +43,19 @@ const scrape = url => {
   });
 };
 
-scrape("http://www.imdb.com/chart/top").then(topMovieList => {
-  console.log(topMovieList);
-});
+(async() => {
+    console.log('Getting the list of top movies...');
+    const moviesList = await scrape("http://www.imdb.com/chart/top");
+    console.log('Getting the list of top tv...');
+    const tvList = await scrape("https://www.imdb.com/chart/toptv");
+
+    const list = [
+        ...moviesList,
+        ...tvList
+    ];
+    
+    console.log('Writing results to file...');
+    fs.writeFileSync('imdb-results.json', JSON.stringify(list));
+    console.log('Done');
+})();
+
